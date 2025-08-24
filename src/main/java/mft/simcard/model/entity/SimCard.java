@@ -9,6 +9,7 @@ import lombok.experimental.SuperBuilder;
 import mft.simcard.model.enums.SimCardOperators;
 import mft.simcard.model.enums.SimStatus;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @SuperBuilder
@@ -24,11 +25,11 @@ public class SimCard {
 
     @JoinColumn(name = "person_id", referencedColumnName = "id")
     @OneToOne(cascade = CascadeType.ALL)
-    @JsonProperty("owner")
+    @JsonProperty("simCardOwner")
     private Person person;
 
     @Column(columnDefinition = "nvarchar2(20)", unique = true, nullable = false)
-    @JsonProperty("sim_operator")
+    @JsonProperty("simOperator")
     private SimCardOperators operator;
 
     @Column(columnDefinition = "nvarchar2(11)", unique = true, nullable = false)
@@ -36,7 +37,7 @@ public class SimCard {
     private String number;
 
     @Column(columnDefinition = "date", nullable = false)
-    private Date registrationDate;
+    private LocalDate registrationDate;
 
     private SimStatus status;
 }

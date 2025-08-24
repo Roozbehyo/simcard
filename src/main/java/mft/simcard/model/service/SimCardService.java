@@ -1,10 +1,11 @@
 package mft.simcard.model.service;
 
 import mft.simcard.model.entity.SimCard;
+import mft.simcard.model.enums.SimStatus;
 import mft.simcard.model.repository.CrudRepository;
-import mft.simcard.servlet.exception.PersonNotFoundException;
 import mft.simcard.servlet.exception.SimCardNotFoundException;
 
+import java.sql.ResultSet;
 import java.util.List;
 
 public class SimCardService {
@@ -25,30 +26,25 @@ public class SimCardService {
     }
 
     public SimCard deleteById(int id) throws Exception {
-        try (CrudRepository<SimCard, Integer> personRepository = new CrudRepository<>()) {
-            if (personRepository.findById(id,SimCard.class) != null) {
-                return personRepository.deleteById(id,SimCard.class);
+        try (CrudRepository<SimCard, Integer> simCardRepository = new CrudRepository<>()) {
+            if (simCardRepository.findById(id,SimCard.class) != null) {
+                return simCardRepository.deleteById(id,SimCard.class);
             } else {
-                throw new PersonNotFoundException();
+                throw new SimCardNotFoundException();
             }
         }
     }
 
     public List<SimCard> findAll() throws Exception {
-        try (CrudRepository<SimCard, Integer> personRepository = new CrudRepository<>()) {
-            return personRepository.findAll(SimCard.class);
+        try (CrudRepository<SimCard, Integer> simCardRepository = new CrudRepository<>()) {
+            String whereClause = " status = "+ SimStatus.ENABLE;
+            return simCardRepository.findAll(SimCard.class,whereClause);
         }
     }
 
     public SimCard findById(int id) throws Exception {
-        try (CrudRepository<SimCard, Integer> personRepository = new CrudRepository<>()) {
-            return personRepository.findById(id,SimCard.class);
+        try (CrudRepository<SimCard, Integer> simCardRepository = new CrudRepository<>()) {
+            return simCardRepository.findById(id,SimCard.class);
         }
     }
-
-//    public List<Person> findByNameAndFamily(String name, String family) throws Exception {
-//        try (CrudRepository<Person, Integer> personRepository = new CrudRepository<>()) {
-//            return personRepository.findByNameAndFamily(name, family);
-//        }
-//    }
 }

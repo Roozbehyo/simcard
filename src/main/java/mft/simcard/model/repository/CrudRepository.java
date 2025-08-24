@@ -4,6 +4,7 @@ import mft.simcard.model.tools.JpaProvider;
 
 import jakarta.persistence.*;
 
+import java.sql.ResultSet;
 import java.util.List;
 
 public class CrudRepository<T, I> implements AutoCloseable {
@@ -43,13 +44,18 @@ public class CrudRepository<T, I> implements AutoCloseable {
         return query.getResultList();
     }
 
+    public List<T> findAll(Class<T> tClass, String whereClause) {
+        TypedQuery<T> query = entityManager.createQuery("select p from " + tClass.getAnnotation(Entity.class).name() + " where "+ whereClause, tClass);
+        return query.getResultList();
+    }
+
     public T findById(I id, Class<T> tClass) {
         return entityManager.find(tClass, id);
     }
 
-    public List<T> findByNameAndFamily(Class<T> tClass) {
-        TypedQuery<T> query = entityManager.createQuery("select p from " + tClass.getAnnotation(Entity.class).name() + " p", tClass);
-        return query.getResultList();
+    public T findByNameAndFamily(Class<T> tClass, String name, String family) {
+        TypedQuery<T> query = entityManager.createQuery("select p from " + tClass.getAnnotation(Entity.class).name() + " where name = ? and family = ? ", tClass);
+        return query.setParameter(1, name).setParameter(2, family).getSingleResult();
     }
     @Override
     public void close() throws Exception {

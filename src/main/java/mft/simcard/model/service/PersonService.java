@@ -45,9 +45,9 @@ public class PersonService {
         }
     }
 
-    public List<Person> findByNameAndFamily(String name, String family) throws Exception {
+    public Person findByNameAndFamily(String name, String family) throws Exception {
         try (CrudRepository<Person, Integer> personRepository = new CrudRepository<>()) {
-            return personRepository.findByNameAndFamily(name, family);
+            return personRepository.findByNameAndFamily(Person.class,name, family);
         }
     }
 }
