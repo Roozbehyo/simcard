@@ -47,4 +47,15 @@ public class SimCardService {
             return simCardRepository.findById(id,SimCard.class);
         }
     }
+
+    public SimCard findByNumber(String number) throws Exception {
+        try (CrudRepository<SimCard, Integer> simCardRepository = new CrudRepository<>()) {
+           String whereClause = " and number = :number:";
+           List<SimCard> results = simCardRepository.findAll(SimCard.class,whereClause);
+           if (results.size() > 0) {
+               return results.get(0);
+           }
+        }
+        return null;
+    }
 }

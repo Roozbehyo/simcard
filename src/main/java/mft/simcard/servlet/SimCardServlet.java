@@ -1,5 +1,7 @@
 package mft.simcard.servlet;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.annotation.WebServlet;
 import mft.simcard.model.entity.Person;
 import mft.simcard.model.entity.SimCard;
 import mft.simcard.model.enums.SimCardOperators;
@@ -11,31 +13,46 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import mft.simcard.servlet.exception.SimCardHasAlreadyExistException;
 import mft.simcard.servlet.exception.SimCardNotFoundException;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.List;
 
+@WebServlet("/simcard")
 public class SimCardServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setContentType("application/json; charset=UTF-8");
+        ObjectMapper mapper = new ObjectMapper();
         try {
             SimCardService simCardService = new SimCardService();
-            req.getSession().setAttribute("simCardList", simCardService.findAll());
+            List<SimCard> simCards = simCardService.findAll();
+            req.getSession().setAttribute("simCardList", simCards);
+            String json = mapper.writeValueAsString(simCards);
+            resp.getWriter().write(json);
             System.out.println("Info : FindAll SimCards");
         } catch (SimCardNotFoundException e) {
             System.out.println("Error : " + e.getMessage());
         } catch (Exception e) {
             System.out.println("Unexpected error: " + e.getMessage());
+        } finally {
+            resp.sendRedirect("index.html");
         }
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
-            PersonService personService = new PersonService();
-           Person person = personService.findByNameAndFamily(req.getParameter("name"), req.getParameter("family"));
             SimCardService simCardService = new SimCardService();
+            SimCard result = simCardService.findByNumber(req.getParameter("number"));
+            if (result != null) {
+                throw new SimCardHasAlreadyExistException();
+            }
+
+            PersonService personService = new PersonService();
+            Person person = personService.findByNameAndFamily(req.getParameter("name"), req.getParameter("family"));
             SimCard simCard =
                     SimCard
                             .builder()
